@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table(name="contract_order_invoice")
- * @ORM\Entity(repositoryClass="App\Repository\MyContractOrderInvoiceRepository")
+ * @ORM\Entity(repositoryClass="ControleOnline\Repository\MyContractOrderInvoiceRepository")
  * @ORM\EntityListeners({App\Listener\LogListener::class}) 
  */
 class MyContractOrderInvoice

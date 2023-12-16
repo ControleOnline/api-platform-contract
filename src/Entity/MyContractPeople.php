@@ -18,7 +18,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 /**
  * @ORM\EntityListeners ({App\Listener\LogListener::class})
  * @ORM\Table (name="contract_people")
- * @ORM\Entity (repositoryClass="App\Repository\MyContractPeopleRepository")
+ * @ORM\Entity (repositoryClass="ControleOnline\Repository\MyContractPeopleRepository")
  * @UniqueEntity (
  *     fields   ={"contract", "people", "peopleType"},
  *     errorPath="peopleType",
