@@ -10,5 +10,5 @@ config\services.yaml
 
 ```yaml
 imports:
-    - { resource: "../vendor/controleonline/contract/config/services/services.yaml" }    
+    - { resource: "../modules/controleonline/contract/config/services/services.yaml" }    
 ```
