@@ -1,3 +1,5 @@
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/controleonline/api-platform-contract/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/controleonline/api-platform-contract/?branch=master)
+
 # contract
 
 
