@@ -13,6 +13,7 @@ use DateTime;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+
 /**
  * @ORM\EntityListeners ({ControleOnline\Listener\LogListener::class})
  * @ORM\Entity (repositoryClass="ControleOnline\Repository\ContractRepository")
@@ -20,9 +21,21 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new Get(security: 'is_granted(\'ROLE_CLIENT\')'),
-        new Put(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/contracts/{id}/change/payment', controller: \App\Controller\ChangeContractPaymentAction::class),
-        new Put(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/contracts/{id}/change', controller: \App\Controller\ChangeContractAction::class),
-        new Put(uriTemplate: 'contracts/{id}/status/{status}', controller: \App\Controller\ChangeContractStatusAction::class, openapiContext: []),
+        new Put(
+            security: 'is_granted(\'ROLE_CLIENT\')',
+            uriTemplate: '/contracts/{id}/change/payment',
+            controller: \App\Controller\ChangeContractPaymentAction::class
+        ),
+        new Put(
+            security: 'is_granted(\'ROLE_CLIENT\')',
+            uriTemplate: '/contracts/{id}/change',
+            controller: \App\Controller\ChangeContractAction::class
+        ),
+        new Put(
+            uriTemplate: 'contracts/{id}/status/{status}',
+            controller: \App\Controller\ChangeContractStatusAction::class,
+            openapiContext: []
+        ),
         new Post(),
         new GetCollection()
     ],
@@ -34,7 +47,7 @@ class Contract
      * @ORM\Column(type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @Groups({"contract_people:read", "task_read","logistic_read"})
+     * @Groups({"contract_people:read","logistic_read"})
      */
     private $id;
     /**
@@ -88,7 +101,6 @@ class Contract
      *      joinColumns={@ORM\JoinColumn(name="contract_id", referencedColumnName="id")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="people_id", referencedColumnName="id")}
      *      )
-     * @Groups({"task_read"})
      */
     private $peoples;
 
@@ -100,69 +112,69 @@ class Contract
         $this->creationDate = new DateTime('now');
         $this->alterDate = new DateTime('now');
     }
-    public function getId() : int
+    public function getId(): int
     {
         return $this->id;
     }
-    public function getDocumentModel() : DocumentModel
+    public function getDocumentModel(): DocumentModel
     {
         return $this->contractModel;
     }
-    public function setDocumentModel(DocumentModel $document_model) : Contract
+    public function setDocumentModel(DocumentModel $document_model): Contract
     {
         $this->contractModel = $document_model;
         return $this;
     }
-    public function getKey() : ?string
+    public function getKey(): ?string
     {
         return $this->doc_key;
     }
-    public function setKey(string $doc_key) : Contract
+    public function setKey(string $doc_key): Contract
     {
         $this->doc_key = $doc_key;
         return $this;
     }
-    public function getContractStatus() : string
+    public function getContractStatus(): string
     {
         return $this->contractStatus;
     }
-    public function setContractStatus(string $contract_status) : Contract
+    public function setContractStatus(string $contract_status): Contract
     {
         $this->contractStatus = $contract_status;
         return $this;
     }
-    public function getStartDate() : DateTime
+    public function getStartDate(): DateTime
     {
         return $this->startDate;
     }
-    public function setStartDate(DateTime $start_date) : Contract
+    public function setStartDate(DateTime $start_date): Contract
     {
         $this->startDate = $start_date;
         return $this;
     }
-    public function getEndDate() : ?DateTime
+    public function getEndDate(): ?DateTime
     {
         return $this->endDate;
     }
-    public function setEndDate(DateTime $end_date) : Contract
+    public function setEndDate(DateTime $end_date): Contract
     {
         $this->endDate = $end_date;
         return $this;
     }
-    public function getCreationDate() : DateTime
+    public function getCreationDate(): DateTime
     {
         return $this->creationDate;
     }
-    public function setCreationDate(DateTime $creation_date) : Contract
+    public function setCreationDate(DateTime $creation_date): Contract
     {
         $this->creationDate = $creation_date;
         return $this;
     }
-    public function getAlterDate() : DateTime
+    public function getAlterDate(): DateTime
     {
         return $this->alterDate;
     }
-    public function setAlterDate(DateTime $alter_date) : Contract
+    public function setAlterDate(DateTime $alter_date): Contract
     {
         $this->alterDate = $alter_date;
         return $this;
@@ -174,14 +186,13 @@ class Contract
     {
         return $this->contractParent;
     }
-    public function setContractParentId(Contract $contractParent) : Contract
+    public function setContractParentId(Contract $contractParent): Contract
     {
         $this->contractParent = $contractParent;
         return $this;
     }
-    public function getPeoples() : Collection
+    public function getPeoples(): Collection
     {
         return $this->peoples;
     }
-
 }
