@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiFilter;
@@ -58,10 +59,17 @@ class Contract
      */
     private $contractModel;
     /**
-     * @ORM\Column(name="contract_status", type="string")
-     * @Groups("contract_people:read")
+     * @var \ControleOnline\Entity\Status
+     *
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Status")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="status_id", referencedColumnName="id")
+     * })
+     * @Groups({"display_read","order_read","order_write"})
      */
-    private $contractStatus;
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['status' => 'exact'])]
+
+    private $status;
     //, columnDefinition="enum('Active', 'Canceled', 'Amended')"
     /**
      * @ORM\Column(name="doc_key", type="string")
@@ -134,15 +142,30 @@ class Contract
         $this->doc_key = $doc_key;
         return $this;
     }
-    public function getContractStatus(): string
+
+    /**
+     * Set status
+     *
+     * @param \ControleOnline\Entity\Status $status
+     * @return Order
+     */
+    public function setStatus(\ControleOnline\Entity\Status $status = null)
     {
-        return $this->contractStatus;
-    }
-    public function setContractStatus(string $contract_status): Contract
-    {
-        $this->contractStatus = $contract_status;
+        $this->status = $status;
+
         return $this;
     }
+
+    /**
+     * Get status
+     *
+     * @return \ControleOnline\Entity\Status
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
     public function getStartDate(): DateTime
     {
         return $this->startDate;
