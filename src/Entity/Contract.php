@@ -51,7 +51,7 @@ class Contract
      */
     private $id;
     /**
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\DocumentModel")
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\File")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(referencedColumnName="id", nullable=false)
      * })
@@ -87,7 +87,7 @@ class Contract
      */
     private $alterDate;
     /**
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\DocumentModel")
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\File")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="contract_parent_id", referencedColumnName="id", nullable=true)
      * })
@@ -116,11 +116,11 @@ class Contract
     {
         return $this->id;
     }
-    public function getDocumentModel(): DocumentModel
+    public function getFile(): File
     {
         return $this->contractModel;
     }
-    public function setDocumentModel(DocumentModel $document_model): Contract
+    public function setFile(File $document_model): Contract
     {
         $this->contractModel = $document_model;
         return $this;
