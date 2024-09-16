@@ -40,9 +40,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         new Post(),
         new GetCollection()
     ],
-    formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']],
-    normalizationContext: ['groups' => ['order_product_read']],
-    denormalizationContext: ['groups' => ['order_product_write']]
+    formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']]
 )]
 class Contract
 {
@@ -75,7 +73,7 @@ class Contract
     //, columnDefinition="enum('Active', 'Canceled', 'Amended')"
     /**
      * @ORM\Column(name="doc_key", type="string")
-     * @Groups("contract_people:read", "order_read")
+     * @Groups("contract_people:read")
      */
     private $doc_key;
     /**
