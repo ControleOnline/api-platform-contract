@@ -40,7 +40,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
         new Post(),
         new GetCollection()
     ],
-    formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']]
+    formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']],
+    normalizationContext: ['groups' => ['contract_read']],
+    denormalizationContext: ['groups' => ['contract_write']]
 )]
 class Contract
 {
@@ -48,7 +50,7 @@ class Contract
      * @ORM\Column(type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @Groups({"contract_people:read","logistic_read"})
+     * @Groups({"contract_people:read","logistic_read", "contract_read"})
      */
     private $id;
     /**
@@ -56,6 +58,7 @@ class Contract
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(referencedColumnName="id", nullable=false)
      * })
+     * @Groups({"contract_read"})
      */
     private $contractModel;
     /**
@@ -65,7 +68,7 @@ class Contract
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="status_id", referencedColumnName="id")
      * })
-     * @Groups({"display_read","order_read","order_write"})
+     * @Groups({"contract_read"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['status' => 'exact'])]
 
@@ -73,25 +76,27 @@ class Contract
     //, columnDefinition="enum('Active', 'Canceled', 'Amended')"
     /**
      * @ORM\Column(name="doc_key", type="string")
-     * @Groups("contract_people:read")
+     * @Groups("contract_people:read", "contract_read")
      */
     private $doc_key;
     /**
      * @ORM\Column(name="start_date", type="datetime",  nullable=false)
-     * @Groups("contract_people:read")
+     * @Groups("contract_people:read", "contract_read")
      */
     private $startDate;
     /**
      * @ORM\Column(name="end_date", type="datetime",  nullable=false)
-     * @Groups("contract_people:read")
+     * @Groups("contract_people:read", "contract_read")
      */
     private $endDate;
     /**
      * @ORM\Column(name="creation_date", type="datetime",  nullable=false)
+     * @Groups({"contract_read"})
      */
     private $creationDate;
     /**
      * @ORM\Column(name="alter_date", type="datetime",  nullable=false)
+     * @Groups({"contract_read"})
      */
     private $alterDate;
     /**
@@ -99,6 +104,7 @@ class Contract
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="contract_parent_id", referencedColumnName="id", nullable=true)
      * })
+     * @Groups({"contract_read"})
      */
     private $contractParent;
     /**
@@ -109,6 +115,7 @@ class Contract
      *      joinColumns={@ORM\JoinColumn(name="contract_id", referencedColumnName="id")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="people_id", referencedColumnName="id")}
      *      )
+     * @Groups({"contract_read"})
      */
     private $peoples;
 
