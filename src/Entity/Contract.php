@@ -38,7 +38,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
             openapiContext: []
         ),
         new Post(),
-        new GetCollection()
+        new GetCollection(security: 'is_granted(\'ROLE_CLIENT\')')
+
     ],
     formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']],
     normalizationContext: ['groups' => ['contract_read']],
@@ -50,7 +51,7 @@ class Contract
      * @ORM\Column(type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @Groups({"contract_people:read","logistic_read", "contract_read"})
+     * @Groups({ "contract_read"})
      */
     private $id;
     /**
@@ -76,17 +77,17 @@ class Contract
     //, columnDefinition="enum('Active', 'Canceled', 'Amended')"
     /**
      * @ORM\Column(name="doc_key", type="string")
-     * @Groups("contract_people:read", "contract_read")
+     *    @Groups({"contract_read"})
      */
     private $doc_key;
     /**
      * @ORM\Column(name="start_date", type="datetime",  nullable=false)
-     * @Groups("contract_people:read", "contract_read")
+     *    @Groups({"contract_read"})
      */
     private $startDate;
     /**
      * @ORM\Column(name="end_date", type="datetime",  nullable=false)
-     * @Groups("contract_people:read", "contract_read")
+     *    @Groups({"contract_read"})
      */
     private $endDate;
     /**
