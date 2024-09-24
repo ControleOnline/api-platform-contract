@@ -39,7 +39,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ),
         new Post(),
         new GetCollection(security: 'is_granted(\'ROLE_CLIENT\')')
-
     ],
     formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']],
     normalizationContext: ['groups' => ['contract_read']],
@@ -55,13 +54,24 @@ class Contract
      */
     private $id;
     /**
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\File")
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\ContractModel")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(referencedColumnName="id", nullable=false)
      * })
      * @Groups({"contract_read"})
      */
     private $contractModel;
+
+
+    /**
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\File")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(referencedColumnName="id", nullable=false)
+     * })
+     * @Groups({"contract_read"})
+     */
+    private $contractFile;
+
     /**
      * @var \ControleOnline\Entity\Status
      *
@@ -77,17 +87,17 @@ class Contract
     //, columnDefinition="enum('Active', 'Canceled', 'Amended')"
     /**
      * @ORM\Column(name="doc_key", type="string")
-     *    @Groups({"contract_read"})
+     * @Groups({"contract_read"})
      */
     private $doc_key;
     /**
      * @ORM\Column(name="start_date", type="datetime",  nullable=false)
-     *    @Groups({"contract_read"})
+     * @Groups({"contract_read"})
      */
     private $startDate;
     /**
      * @ORM\Column(name="end_date", type="datetime",  nullable=false)
-     *    @Groups({"contract_read"})
+     * @Groups({"contract_read"})
      */
     private $endDate;
     /**
@@ -101,7 +111,7 @@ class Contract
      */
     private $alterDate;
     /**
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\File")
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Contract")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="contract_parent_id", referencedColumnName="id", nullable=true)
      * })
@@ -132,11 +142,11 @@ class Contract
     {
         return $this->id;
     }
-    public function getFile(): File
+    public function getContractModel(): ContractModel
     {
         return $this->contractModel;
     }
-    public function setFile(File $document_model): Contract
+    public function setContractModel(ContractModel $document_model): Contract
     {
         $this->contractModel = $document_model;
         return $this;
@@ -225,5 +235,23 @@ class Contract
     public function getPeoples(): Collection
     {
         return $this->peoples;
+    }
+
+    /**
+     * Get })
+     */
+    public function getContractFile()
+    {
+        return $this->contractFile;
+    }
+
+    /**
+     * Set })
+     */
+    public function setContractFile($contractFile): self
+    {
+        $this->contractFile = $contractFile;
+
+        return $this;
     }
 }
