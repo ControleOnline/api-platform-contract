@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\ApiProperty;
@@ -21,9 +22,19 @@ use Symfony\Component\Serializer\Annotation\Groups;
  */
 #[ApiResource(
     operations: [
-        new Get(security: 'is_granted(\'ROLE_CLIENT\')'),
-        new Put(),
-        new Post(),
+        new Get(
+            security: 'is_granted(\'ROLE_CLIENT\')',
+            normalizationContext: ['groups' => ['contract_model_detail_read']]
+        ),
+        new Put(
+            security: 'is_granted(\'ROLE_CLIENT\')'
+        ),
+        new Post(
+            security: 'is_granted(\'ROLE_CLIENT\')'
+        ),
+        new Delete(
+            security: 'is_granted(\'ROLE_CLIENT\')'
+        ),
         new GetCollection(security: 'is_granted(\'ROLE_CLIENT\')')
     ],
     formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']],
@@ -36,7 +47,7 @@ class ContractModel
      * @ORM\Column(type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @Groups({ "contract_read"})
+     * @Groups({ "contract_read","contract_model_read","contract_model_detail_read"})
      */
     private $id;
 
@@ -47,7 +58,7 @@ class ContractModel
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="category_id", referencedColumnName="id")
      * })
-     * @Groups({"contract_read"})
+     * @Groups({"contract_read","contract_model_read","contract_model_write","contract_model_detail_read"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['category' => 'exact'])]
 
@@ -59,41 +70,53 @@ class ContractModel
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="people_id", referencedColumnName="id")
      * })
-     * @Groups({"contract_read"})
+     * @Groups({"contract_read","contract_model_read","contract_model_write","contract_model_detail_read"})
      */
-    private $people;
-    /**
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\File")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(referencedColumnName="id", nullable=false)
-     * })
-     * @Groups({"contract_read"})
-     */
-    private $file;
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['people' => 'exact'])]
 
-    public function __construct() {}
+    private $people;
+
+
+    /**
+     * @var \ControleOnline\Entity\People
+     *
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\People")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="signer_id", referencedColumnName="id")
+     * })
+     * @Groups({"contract_read","contract_model_read","contract_model_write","contract_model_detail_read"})
+     */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['signer' => 'exact'])]
+
+    private $signer;
+
+    /**
+     * @ORM\Column(name="content", type="string")
+     * @Groups({"contract_model_detail_read","contract_model_write","contract_model_detail_read"})
+     */
+    private $content;
+
+    /**
+     * @ORM\Column(name="context", type="string")
+     * @Groups({"contract_read","contract_model_read","contract_model_detail_read","contract_model_write","contract_model_detail_read"})
+     */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['context' => 'exact'])]
+    private $context;
+
+    /**
+     * @ORM\Column(name="model", type="string")
+     * @Groups({"contract_read","contract_model_read","contract_model_detail_read","contract_model_write","contract_model_detail_read"})
+     */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['model' => 'partial'])]
+    private $model;
+
+
     public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * Get })
-     */
-    public function getFile()
-    {
-        return $this->file;
-    }
 
-    /**
-     * Set })
-     */
-    public function setFile($file): self
-    {
-        $this->file = $file;
-
-        return $this;
-    }
 
     /**
      * Get the value of people
@@ -127,6 +150,78 @@ class ContractModel
     public function setCategory($category): self
     {
         $this->category = $category;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of content
+     */
+    public function getContent()
+    {
+        return $this->content;
+    }
+
+    /**
+     * Set the value of content
+     */
+    public function setContent($content): self
+    {
+        $this->content = $content;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of model
+     */
+    public function getModel()
+    {
+        return $this->model;
+    }
+
+    /**
+     * Set the value of model
+     */
+    public function setModel($model): self
+    {
+        $this->model = $model;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of context
+     */
+    public function getContext()
+    {
+        return $this->context;
+    }
+
+    /**
+     * Set the value of context
+     */
+    public function setContext($context): self
+    {
+        $this->context = $context;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of signer
+     */
+    public function getSigner()
+    {
+        return $this->signer;
+    }
+
+    /**
+     * Set the value of signer
+     */
+    public function setSigner($signer): self
+    {
+        $this->signer = $signer;
 
         return $this;
     }
