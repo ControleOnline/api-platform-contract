@@ -24,7 +24,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
     operations: [
         new Get(
             security: 'is_granted(\'ROLE_CLIENT\')',
-            normalizationContext: ['groups' => ['contract_model_detail_read']]
         ),
         new Put(
             security: 'is_granted(\'ROLE_CLIENT\')'
@@ -47,7 +46,7 @@ class ContractModel
      * @ORM\Column(type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @Groups({ "contract_read","contract_model_read","contract_model_detail_read"})
+     * @Groups({ "contract_read","contract_model_read"})
      */
     private $id;
 
@@ -58,7 +57,7 @@ class ContractModel
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="category_id", referencedColumnName="id")
      * })
-     * @Groups({"contract_read","contract_model_read","contract_model_write","contract_model_detail_read"})
+     * @Groups({"contract_read","contract_model_read","contract_model_write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['category' => 'exact'])]
 
@@ -70,7 +69,7 @@ class ContractModel
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="people_id", referencedColumnName="id")
      * })
-     * @Groups({"contract_read","contract_model_read","contract_model_write","contract_model_detail_read"})
+     * @Groups({"contract_read","contract_model_read","contract_model_write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['people' => 'exact'])]
 
@@ -84,28 +83,33 @@ class ContractModel
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="signer_id", referencedColumnName="id")
      * })
-     * @Groups({"contract_read","contract_model_read","contract_model_write","contract_model_detail_read"})
+     * @Groups({"contract_read","contract_model_read","contract_model_write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['signer' => 'exact'])]
 
     private $signer;
 
     /**
-     * @ORM\Column(name="content", type="string")
-     * @Groups({"contract_model_detail_read","contract_model_write","contract_model_detail_read"})
+     * @var \ControleOnline\Entity\File
+     *
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\File")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="file_id", referencedColumnName="id")
+     * })
+     * @Groups({"contract_model_detail_read","contract_model_read","contract_model_write"})
      */
-    private $content;
+    private $file;
 
     /**
      * @ORM\Column(name="context", type="string")
-     * @Groups({"contract_read","contract_model_read","contract_model_detail_read","contract_model_write","contract_model_detail_read"})
+     * @Groups({"contract_read","contract_model_read","contract_model_write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['context' => 'exact'])]
     private $context;
 
     /**
      * @ORM\Column(name="model", type="string")
-     * @Groups({"contract_read","contract_model_read","contract_model_detail_read","contract_model_write","contract_model_detail_read"})
+     * @Groups({"contract_read","contract_model_read","contract_model_write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['model' => 'partial'])]
     private $model;
@@ -154,23 +158,7 @@ class ContractModel
         return $this;
     }
 
-    /**
-     * Get the value of content
-     */
-    public function getContent()
-    {
-        return $this->content;
-    }
 
-    /**
-     * Set the value of content
-     */
-    public function setContent($content): self
-    {
-        $this->content = $content;
-
-        return $this;
-    }
 
     /**
      * Get the value of model
@@ -222,6 +210,24 @@ class ContractModel
     public function setSigner($signer): self
     {
         $this->signer = $signer;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of file
+     */
+    public function getFile(): \ControleOnline\Entity\File
+    {
+        return $this->file;
+    }
+
+    /**
+     * Set the value of file
+     */
+    public function setFile(\ControleOnline\Entity\File $file): self
+    {
+        $this->file = $file;
 
         return $this;
     }
