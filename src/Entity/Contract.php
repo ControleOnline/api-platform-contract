@@ -54,7 +54,7 @@ class Contract
      */
     private $id;
     /**
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\ContractModel")
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Model")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(referencedColumnName="id", nullable=false)
      * })
@@ -142,11 +142,11 @@ class Contract
     {
         return $this->id;
     }
-    public function getContractModel(): ContractModel
+    public function getModel(): Model
     {
         return $this->contractModel;
     }
-    public function setContractModel(ContractModel $document_model): Contract
+    public function setModel(Model $document_model): Contract
     {
         $this->contractModel = $document_model;
         return $this;
