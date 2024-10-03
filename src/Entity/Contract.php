@@ -22,21 +22,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new Get(security: 'is_granted(\'ROLE_CLIENT\')'),
-        new Put(
-            security: 'is_granted(\'ROLE_CLIENT\')',
-            uriTemplate: '/contracts/{id}/change/payment',
-            controller: \App\Controller\ChangeContractPaymentAction::class
-        ),
-        new Put(
-            security: 'is_granted(\'ROLE_CLIENT\')',
-            uriTemplate: '/contracts/{id}/change',
-            controller: \App\Controller\ChangeContractAction::class
-        ),
-        new Put(
-            uriTemplate: 'contracts/{id}/status/{status}',
-            controller: \App\Controller\ChangeContractStatusAction::class,
-            openapiContext: []
-        ),
+        new Put(security: 'is_granted(\'ROLE_CLIENT\')'),
         new Post(),
         new GetCollection(security: 'is_granted(\'ROLE_CLIENT\')')
     ],
@@ -58,19 +44,12 @@ class Contract
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(referencedColumnName="id", nullable=false)
      * })
-     * @Groups({"contract_read"})
+     * @Groups({"contract_read","contract_write"})
      */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['contractModel' => 'exact'])]
+
     private $contractModel;
 
-
-    /**
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\File")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(referencedColumnName="id", nullable=false)
-     * })
-     * @Groups({"contract_read"})
-     */
-    private $contractFile;
 
     /**
      * @var \ControleOnline\Entity\Status
@@ -79,7 +58,7 @@ class Contract
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="status_id", referencedColumnName="id")
      * })
-     * @Groups({"contract_read"})
+     * @Groups({"contract_read","contract_write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['status' => 'exact'])]
 
@@ -87,47 +66,61 @@ class Contract
     //, columnDefinition="enum('Active', 'Canceled', 'Amended')"
     /**
      * @ORM\Column(name="doc_key", type="string")
-     * @Groups({"contract_read"})
+     * @Groups({"contract_read","contract_write"})
      */
     private $doc_key;
     /**
      * @ORM\Column(name="start_date", type="datetime",  nullable=false)
-     * @Groups({"contract_read"})
+     * @Groups({"contract_read","contract_write"})
      */
     private $startDate;
     /**
-     * @ORM\Column(name="end_date", type="datetime",  nullable=false)
-     * @Groups({"contract_read"})
+     * @ORM\Column(name="end_date", type="datetime",  nullable=true)
+     * @Groups({"contract_read","contract_write"})
      */
     private $endDate;
     /**
      * @ORM\Column(name="creation_date", type="datetime",  nullable=false)
-     * @Groups({"contract_read"})
+     * @Groups({"contract_read","contract_write"})
      */
     private $creationDate;
     /**
      * @ORM\Column(name="alter_date", type="datetime",  nullable=false)
-     * @Groups({"contract_read"})
+     * @Groups({"contract_read","contract_write"})
      */
     private $alterDate;
+
     /**
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Contract")
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\File")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="contract_parent_id", referencedColumnName="id", nullable=true)
+     *   @ORM\JoinColumn(referencedColumnName="id", nullable=true)
      * })
-     * @Groups({"contract_read"})
+     * @Groups({"contract_read","contract_write"})
      */
-    private $contractParent;
+    private $contractFile;
+
+    /**
+     * @var \ControleOnline\Entity\People
+     *
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\People")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="beneficiary_id", referencedColumnName="id")
+     * })
+     * @Groups({"contract_read","contract_write"})
+     */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['beneficiary' => 'exact'])]
+
+    private $beneficiary;
+
     /**
      * Many Contracts have Many Peoples.
      *
-     * @ORM\ManyToMany(targetEntity="ControleOnline\Entity\People")
-     * @ORM\JoinTable(name="contract_people",
-     *      joinColumns={@ORM\JoinColumn(name="contract_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="people_id", referencedColumnName="id")}
-     *      )
-     * @Groups({"contract_read"})
+     * @ORM\OneToMany(targetEntity="ControleOnline\Entity\ContractPeople", mappedBy="contract")
+     * @Groups({"contract_read","contract_write"})
      */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['peoples' => 'exact'])]
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['peoples.people.name' => 'partial'])]
+
     private $peoples;
 
 
@@ -142,15 +135,7 @@ class Contract
     {
         return $this->id;
     }
-    public function getModel(): Model
-    {
-        return $this->contractModel;
-    }
-    public function setModel(Model $document_model): Contract
-    {
-        $this->contractModel = $document_model;
-        return $this;
-    }
+
     public function getKey(): ?string
     {
         return $this->doc_key;
@@ -165,7 +150,7 @@ class Contract
      * Set status
      *
      * @param \ControleOnline\Entity\Status $status
-     * @return Order
+     * @return Status
      */
     public function setStatus(\ControleOnline\Entity\Status $status = null)
     {
@@ -197,7 +182,7 @@ class Contract
     {
         return $this->endDate;
     }
-    public function setEndDate(DateTime $end_date): Contract
+    public function setEndDate(?DateTime $end_date): Contract
     {
         $this->endDate = $end_date;
         return $this;
@@ -223,19 +208,6 @@ class Contract
     /**
      * @return mixed
      */
-    public function getContractParent()
-    {
-        return $this->contractParent;
-    }
-    public function setContractParentId(Contract $contractParent): Contract
-    {
-        $this->contractParent = $contractParent;
-        return $this;
-    }
-    public function getPeoples(): Collection
-    {
-        return $this->peoples;
-    }
 
     /**
      * Get })
@@ -253,5 +225,69 @@ class Contract
         $this->contractFile = $contractFile;
 
         return $this;
+    }
+
+    /**
+     * Get the value of beneficiary
+     */
+    public function getBeneficiary()
+    {
+        return $this->beneficiary;
+    }
+
+    /**
+     * Set the value of beneficiary
+     */
+    public function setBeneficiary($beneficiary): self
+    {
+        $this->beneficiary = $beneficiary;
+
+        return $this;
+    }
+
+    /**
+     * Get })
+     */
+    public function getContractModel()
+    {
+        return $this->contractModel;
+    }
+
+    /**
+     * Set })
+     */
+    public function setContractModel($contractModel): self
+    {
+        $this->contractModel = $contractModel;
+
+        return $this;
+    }
+
+
+    /**
+     * Add peoples.
+     *
+     * @return Peoples
+     */
+    public function addPeoples(ContractPeople $peoples)
+    {
+        $this->peoples[] = $peoples;
+        return $this;
+    }
+    /**
+     * Remove peoples.
+     */
+    public function removePeoples(ContractPeople $peoples)
+    {
+        $this->peoples->removeElement($peoples);
+    }
+    /**
+     * Get peoples.
+     *
+     * @return Collection
+     */
+    public function getPeoples()
+    {
+        return $this->peoples;
     }
 }
