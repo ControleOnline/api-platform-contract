@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiFilter;
 use ControleOnline\Controller\GenerateContractController;
+use ControleOnline\Controller\SignContractController;
 use DateTime;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -30,6 +31,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
             security: 'is_granted(\'ROLE_ADMIN\') or (is_granted(\'ROLE_CLIENT\'))',
             uriTemplate: '/contracts/{id}/generate',
             controller: GenerateContractController::class,
+            deserialize: false
+        ),
+        new Post(
+            security: 'is_granted(\'ROLE_ADMIN\') or (is_granted(\'ROLE_CLIENT\'))',
+            uriTemplate: '/contracts/{id}/sign',
+            controller: SignContractController::class,
             deserialize: false
         ),
     ],

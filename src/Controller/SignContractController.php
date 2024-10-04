@@ -11,16 +11,15 @@ use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use ControleOnline\Entity\Contract;
 use ControleOnline\Entity\File;
-use ControleOnline\Service\ContractService;
 
-class GenerateContractController
+class SignContractController
 {
 
     public function __construct(
         private EntityManagerInterface $em,
         private HydratorService $hydratorService,
         private PdfService $pdf,
-        private ContractService $contract,
+        private SignatureService $signature,
     ) {}
 
     public function __invoke(Contract $data): Response
@@ -28,7 +27,7 @@ class GenerateContractController
 
         try {
 
-            $data = $this->contract->genetateFromModel($data);
+            $data = $this->signature->sign($data);
 
             return new JsonResponse($this->hydratorService->data($data, 'contract_read'), Response::HTTP_OK);
         } catch (Exception $e) {
