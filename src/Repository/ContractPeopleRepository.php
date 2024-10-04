@@ -19,16 +19,4 @@ class ContractPeopleRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, ContractPeople::class);
     }
-
-    /*
-    public function findOneBySomeField($value): ?ContractPeople
-    {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

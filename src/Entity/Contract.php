@@ -10,6 +10,7 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiFilter;
+use ControleOnline\Controller\GenerateContractController;
 use DateTime;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -24,7 +25,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
         new Get(security: 'is_granted(\'ROLE_CLIENT\')'),
         new Put(security: 'is_granted(\'ROLE_CLIENT\')'),
         new Post(),
-        new GetCollection(security: 'is_granted(\'ROLE_CLIENT\')')
+        new GetCollection(security: 'is_granted(\'ROLE_CLIENT\')'),
+        new Post(
+            security: 'is_granted(\'ROLE_ADMIN\') or (is_granted(\'ROLE_CLIENT\'))',
+            uriTemplate: '/contracts/{id}/generate',
+            controller: GenerateContractController::class,
+            deserialize: false
+        ),
     ],
     formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']],
     normalizationContext: ['groups' => ['contract_read']],
@@ -63,12 +70,11 @@ class Contract
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['status' => 'exact'])]
 
     private $status;
-    //, columnDefinition="enum('Active', 'Canceled', 'Amended')"
     /**
      * @ORM\Column(name="doc_key", type="string")
      * @Groups({"contract_read","contract_write"})
      */
-    private $doc_key;
+    private $docKey;
     /**
      * @ORM\Column(name="start_date", type="datetime",  nullable=false)
      * @Groups({"contract_read","contract_write"})
@@ -134,16 +140,6 @@ class Contract
     public function getId(): int
     {
         return $this->id;
-    }
-
-    public function getKey(): ?string
-    {
-        return $this->doc_key;
-    }
-    public function setKey(string $doc_key): Contract
-    {
-        $this->doc_key = $doc_key;
-        return $this;
     }
 
     /**
@@ -289,5 +285,23 @@ class Contract
     public function getPeoples()
     {
         return $this->peoples;
+    }
+
+    /**
+     * Get the value of docKey
+     */
+    public function getDocKey()
+    {
+        return $this->docKey;
+    }
+
+    /**
+     * Set the value of docKey
+     */
+    public function setDocKey($docKey): self
+    {
+        $this->docKey = $docKey;
+
+        return $this;
     }
 }
