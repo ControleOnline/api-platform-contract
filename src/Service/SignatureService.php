@@ -4,7 +4,6 @@ namespace ControleOnline\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
 use App\Library\Provider\Signature\SignatureFactory;
-use App\Library\Provider\Signature\Contract as SignatureContract;
 use ControleOnline\Entity\People;
 use ControleOnline\Entity\Config;
 use ControleOnline\Entity\Contract;
@@ -16,16 +15,9 @@ class SignatureService
   public function __construct(
     private EntityManagerInterface $manager,
     private PeopleRoleService $peopleRoleService,
-    private SignatureContract $signatureContract,
     private PdfService $pdf,
     private ModelService $modelService
   ) {}
-
-
-  public function sign(Contract $data)
-  {
-    return $this->signatureContract->sign($data);
-  }
 
   public function genetateFromModel(Contract $data)
   {
