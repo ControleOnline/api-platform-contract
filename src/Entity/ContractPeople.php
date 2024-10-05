@@ -55,14 +55,14 @@ class ContractPeople
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="people_id", referencedColumnName="id", nullable=false)
      * })
-     * @Groups("contract_people:read", "contract:read")
+     * @Groups("contract_people:read", "contract:read", "contract_people:write")
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['people.id' => 'exact'])]
     private $people;
 
     /**
      * @ORM\Column(name="people_type", type="string")
-     * @Groups("contract_people:read", "contract:read")
+     * @Groups("contract_people:read", "contract:read", "contract_people:write")
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['peopleType' => 'exact'])]
     private $peopleType;
@@ -82,7 +82,7 @@ class ContractPeople
 
     /**
      * @ORM\Column(name="contract_percentage", type="float",  nullable=true)
-     * @Groups("contract_people:read", "contract:read")
+     * @Groups("contract_people:read", "contract:read", "contract_people:write")
      */
     private $contractPercentage;
 
