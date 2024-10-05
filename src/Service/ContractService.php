@@ -25,7 +25,13 @@ class ContractService
     $file->setFileType('text');
     $file->setExtension('html');
     $file->setContent($this->modelService->genetateFromModel($data));
+    $file->setFileName($data->getContractModel()->getModel());
+    $file->setPeople($data->getBeneficiary());
+
     $this->manager->persist($file);
+
+    $data->setContractFile($file);
+    $this->manager->persist($data);
     $this->manager->flush();
 
     return $data;
@@ -48,5 +54,8 @@ class ContractService
   }
 
 
-
+  public function afterPersist(Contract $contract)
+  {
+    return  $this->genetateFromModel($contract);
+  }
 }

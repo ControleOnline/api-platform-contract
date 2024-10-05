@@ -25,19 +25,19 @@ use Symfony\Component\Serializer\Annotation\Groups;
     operations: [
         new Get(security: 'is_granted(\'ROLE_CLIENT\')'),
         new Put(security: 'is_granted(\'ROLE_CLIENT\')'),
-        new Post(),
+        new Post(
+            security: 'is_granted(\'ROLE_ADMIN\') or (is_granted(\'ROLE_CLIENT\'))',
+        ),
         new GetCollection(security: 'is_granted(\'ROLE_CLIENT\')'),
         new Post(
             security: 'is_granted(\'ROLE_ADMIN\') or (is_granted(\'ROLE_CLIENT\'))',
             uriTemplate: '/contracts/{id}/generate',
             controller: GenerateContractController::class,
-            deserialize: false
         ),
         new Post(
             security: 'is_granted(\'ROLE_ADMIN\') or (is_granted(\'ROLE_CLIENT\'))',
             uriTemplate: '/contracts/{id}/sign',
             controller: SignContractController::class,
-            deserialize: false
         ),
     ],
     formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']],
