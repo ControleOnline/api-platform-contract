@@ -2,33 +2,42 @@
 
 namespace ControleOnline\Entity;
 
-use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiFilter;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Table (name="contract_people")
- * @ORM\Entity
  * @ORM\EntityListeners ({ControleOnline\Listener\LogListener::class})
+ * @ORM\Entity (repositoryClass="ControleOnline\Repository\ContractPeopleRepository")
  */
+
 #[ApiResource(
-    operations: [new Get(security: 'is_granted(\'ROLE_CLIENT\')')],
-    formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']]
-)]
-#[ApiResource(
-    uriTemplate: '/people/{id}/contracts_peoples.{_format}',
-    uriVariables: ['id' => new Link(
-        fromClass: \ControleOnline\Entity\People::class,
-        identifiers: ['id'],
-        toProperty: 'people'
-    )],
-    status: 200,
-    operations: [new GetCollection()]
+    operations: [
+        new Get(security: 'is_granted(\'ROLE_CLIENT\')'),
+        new Put(
+            security: 'is_granted(\'ROLE_ADMIN\') or (is_granted(\'ROLE_CLIENT\'))',
+            validationContext: ['groups' => ['people_write']],
+            denormalizationContext: ['groups' => ['people_write']]
+        ),
+        new Delete(security: 'is_granted(\'ROLE_CLIENT\')'),
+        new Post(
+            security: 'is_granted(\'ROLE_ADMIN\') or (is_granted(\'ROLE_CLIENT\'))',
+        ),
+        new GetCollection(security: 'is_granted(\'ROLE_CLIENT\')'),
+
+    ],
+    formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']],
+    security: 'is_granted(\'ROLE_CLIENT\')',
+    normalizationContext: ['groups' => ['contract_people_read']],
+    denormalizationContext: ['groups' => ['contract_people_write']]
 )]
 class ContractPeople
 {
@@ -38,6 +47,8 @@ class ContractPeople
      * @ORM\GeneratedValue(strategy="IDENTITY")
      * @Groups("contract_read","contract_people_read")
      */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['id' => 'exact'])]
+
     private $id;
     /**
      * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Contract")
@@ -46,6 +57,7 @@ class ContractPeople
      * })
      * @Groups("contract_people_read")
      */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['contract.id' => 'exact'])]
     private $contract;
     /**
      * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\People", inversedBy="contractsPeople")
@@ -54,55 +66,109 @@ class ContractPeople
      * })
      * @Groups("contract_read","contract_people_read")
      */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['people.id' => 'exact'])]
+
     private $people;
     /**
      * @ORM\Column(name="people_type", type="string", columnDefinition="enum('Beneficiary', 'Witness', 'Payer', 'Provider')")
      * @Groups("contract_read","contract_people_read")
      */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['people_type' => 'exact'])]
     private $people_type;
     /**
      * @ORM\Column(name="contract_percentage", type="float",  nullable=true)
      * @Groups("contract_read","contract_people_read")
      */
     private $contract_percentage;
-    public function getId(): int
+
+
+    /**
+     * Get the value of id
+     */
+    public function getId()
     {
         return $this->id;
     }
-    public function getContract(): Contract
+
+    /**
+     * Set the value of id
+     */
+    public function setId($id): self
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of contract
+     */
+    public function getContract()
     {
         return $this->contract;
     }
-    public function setContract(Contract $contract): ContractPeople
+
+    /**
+     * Set the value of contract
+     */
+    public function setContract($contract): self
     {
         $this->contract = $contract;
+
         return $this;
     }
-    public function getPeople(): People
+
+    /**
+     * Get the value of people
+     */
+    public function getPeople()
     {
         return $this->people;
     }
-    public function setPeople(People $people): ContractPeople
+
+    /**
+     * Set the value of people
+     */
+    public function setPeople($people): self
     {
         $this->people = $people;
+
         return $this;
     }
-    public function getPeopleType(): string
+
+    /**
+     * Get the value of people_type
+     */
+    public function getPeopleType()
     {
         return $this->people_type;
     }
-    public function setPeopleType(string $people_type): ContractPeople
+
+    /**
+     * Set the value of people_type
+     */
+    public function setPeopleType($people_type): self
     {
         $this->people_type = $people_type;
+
         return $this;
     }
-    public function getContractPercentage(): float
+
+    /**
+     * Get the value of contract_percentage
+     */
+    public function getContractPercentage()
     {
-        return $this->contract_percentage ?: 0;
+        return $this->contract_percentage;
     }
-    public function setContractPercentage(float $contract_percentage): ContractPeople
+
+    /**
+     * Set the value of contract_percentage
+     */
+    public function setContractPercentage($contract_percentage): self
     {
         $this->contract_percentage = $contract_percentage;
+
         return $this;
     }
 }

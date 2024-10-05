@@ -3,9 +3,9 @@
 namespace ControleOnline\Repository;
 
 use ControleOnline\Entity\ContractPeople;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\DBAL\Exception;
+use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @method ContractPeople|null find($id, $lockMode = null, $lockVersion = null)
@@ -19,4 +19,6 @@ class ContractPeopleRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, ContractPeople::class);
     }
+
+ 
 }
