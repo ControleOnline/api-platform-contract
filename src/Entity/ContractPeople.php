@@ -77,7 +77,7 @@ class ContractPeople
      * })
      * @Groups({"contract_people:read", "contract_people:write"})
      */
-    #[ApiFilter(filterClass: SearchFilter::class, properties: ['contract.id' => 'exact'])]
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['contract' => 'exact'])]
     private $contract;
 
     /**
