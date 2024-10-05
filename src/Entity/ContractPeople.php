@@ -45,7 +45,7 @@ class ContractPeople
      * @ORM\Column(type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @Groups("contract_people:read", "contract:read")
+     * @Groups({"contract_people:read", "contract:read"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['id' => 'exact'])]
     private $id;
@@ -55,14 +55,14 @@ class ContractPeople
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="people_id", referencedColumnName="id", nullable=false)
      * })
-     * @Groups("contract_people:read", "contract:read", "contract_people:write")
+     * @Groups({"contract_people:read", "contract:read", "contract_people:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['people.id' => 'exact'])]
     private $people;
 
     /**
      * @ORM\Column(name="people_type", type="string")
-     * @Groups("contract_people:read", "contract:read", "contract_people:write")
+     * @Groups({"contract_people:read", "contract:read", "contract_people:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['peopleType' => 'exact'])]
     private $peopleType;
@@ -75,14 +75,14 @@ class ContractPeople
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="contract_id", referencedColumnName="id")
      * })
-     * @Groups("contract_people:read")
+     * @Groups({"contract_people:read"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['contract.id' => 'exact'])]
     private $contract;
 
     /**
      * @ORM\Column(name="contract_percentage", type="float",  nullable=true)
-     * @Groups("contract_people:read", "contract:read", "contract_people:write")
+     * @Groups({"contract_people:read", "contract:read", "contract_people:write"})
      */
     private $contractPercentage;
 
