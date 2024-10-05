@@ -130,7 +130,7 @@ class Contract
      *
      * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\ContractPeople", inversedBy="contract")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="id", referencedColumnName="contract_id")
+     *   @ORM\JoinColumn(name="id", referencedColumnName="contract")
      * })
      * @Groups({"contract:read","contract:write"})
      */
