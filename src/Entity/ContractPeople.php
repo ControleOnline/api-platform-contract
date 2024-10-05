@@ -51,16 +51,6 @@ class ContractPeople
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Contract", inversedBy="peoples")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="contract_id", referencedColumnName="id", nullable=false)
-     * })
-     * @Groups("contract_people:read")
-     */
-    #[ApiFilter(filterClass: SearchFilter::class, properties: ['contract.id' => 'exact'])]
-    private $contract;
-
-    /**
      * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\People", inversedBy="contractsPeople")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="people_id", referencedColumnName="id", nullable=false)
@@ -76,6 +66,16 @@ class ContractPeople
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['peopleType' => 'exact'])]
     private $peopleType;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Contract", inversedBy="peoples")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="contract_id", referencedColumnName="id", nullable=false)
+     * })
+     * @Groups("contract_people:read")
+     */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['contract.id' => 'exact'])]
+    private $contract;
 
     /**
      * @ORM\Column(name="contract_percentage", type="float",  nullable=true)
