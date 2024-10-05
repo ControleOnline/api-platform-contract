@@ -56,6 +56,7 @@ class ContractService
 
   public function afterPersist(Contract $contract)
   {
-    return  $this->genetateFromModel($contract);
+    if ($contract->getStatus()->getRealStatus() == 'open')
+      return  $this->genetateFromModel($contract);
   }
 }

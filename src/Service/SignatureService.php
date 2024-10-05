@@ -3,16 +3,16 @@
 namespace Controleonline\Service;
 
 use ControleOnline\Entity\People;
-use ControleOnline\Entity\Contract as ContractEntity;
+use ControleOnline\Entity\Contract;
 use App\Library\Provider\Signature\Document;
 use App\Library\Provider\Signature\Signer;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Library\Provider\Signature\Exception\InvalidParameterException;
-use App\Library\Provider\Signature\Exception\ProviderRequestException;
-use App\Library\Exception\MissingDataException;
 use App\Library\Provider\Signature\SignatureFactory;
 use ControleOnline\Entity\Config;
+use ControleOnline\Entity\Status;
+use ControleOnline\Service\ContractService;
 use ControleOnline\Service\PeopleRoleService;
+use Exception;
 
 class SignatureService
 {
@@ -21,56 +21,44 @@ class SignatureService
     public function __construct(
         private EntityManagerInterface $manager,
         private PeopleRoleService $peopleRoleService,
-
+        private ContractService $contractService,
     ) {}
 
 
-    public function sign(ContractEntity $data)
+    public function sign(Contract $data)
     {
 
-        $this->signatureProvider = $this->getFactory();
+        $this->signatureProvider = $this->getFactory($data);
 
-        if ($this->signatureProvider === null) {
-            $data->setContractStatus('Waiting approval');
-        } else {
+        if ($this->signatureProvider !== null) {
 
-            try {
 
-                $document = ($this->signatureProvider->createDocument())
-                    ->setFileName(
-                        sprintf('Contrato-%s', $this->getContractContractorSignerName($data))
-                    )
-                    ->setContent($data->getContractFile()->getContent())
-                    ->setDeadlineAt(
-                        (new \DateTime('now'))
-                            ->add(new \DateInterval('P7D'))
-                            ->format('c')
-                    );
+            $document = ($this->signatureProvider->createDocument())
+                ->setFileName(
+                    sprintf('Contrato-%s', $this->getContractContractorSignerName($data))
+                )
+                ->setContent(
+                    $this->contractService->getContractPDFContent($data)
+                )
+                ->setDeadlineAt(
+                    (new \DateTime('now'))
+                        ->add(new \DateInterval('P7D'))
+                        ->format('c')
+                );
+            /*
+            $this->addDocumentSignersFromContract($document, $data);
+            $this->signatureProvider->saveDocument($document);
+            */
 
-                // config signers
+            $data->setStatus(
+                $this->manager->getRepository(Status::class)->findOneBy(
+                    ['status' => 'Waiting Signature']
+                )
+            );
+            $data->setDocKey($document->getKey());
 
-                $this->addDocumentSignersFromContract($document, $data);
-
-                // create document in cloud service
-
-                $this->signatureProvider->saveDocument($document);
-
-                // update contract status
-
-                $data->setContractStatus('Waiting signatures');
-                $data->setDocKey($document->getKey());
-
-                $this->manager->persist($data);
-                $this->manager->flush($data);
-            } catch (InvalidParameterException $e) {
-                throw new \Exception($e->getMessage());
-            } catch (ProviderRequestException $e) {
-                throw new \Exception($e->getMessage());
-            } catch (MissingDataException $e) {
-                throw new \Exception($e->getMessage());
-            } catch (\Exception $e) {
-                throw new \Exception($e->getMessage());
-            }
+            $this->manager->persist($data);
+            $this->manager->flush();
         }
         return $data;
     }
@@ -92,9 +80,11 @@ class SignatureService
         throw new \Exception('Company not found');
     }
 
-    private function getDefaultProviderFromConfig(): ?string
+    private function getDefaultProviderFromConfig(Contract $data): ?string
     {
-        $myCompany = $this->peopleRoleService->getMainCompany();
+        $myCompany = $data->getBeneficiary();
+
+
         if ($myCompany instanceof People) {
             $configs = $this->manager->getRepository(Config::class)
                 ->getKeyValuesByPeople(
@@ -112,11 +102,11 @@ class SignatureService
 
         throw new \Exception('Company not found');
     }
-    
-    private function getFactory(?string $factoryName = null): ?SignatureFactory
+
+    private function getFactory(Contract $data): ?SignatureFactory
     {
-        $providerName = $factoryName === null ?
-            $this->getDefaultProviderFromConfig() : $factoryName;
+        $providerName =
+            $this->getDefaultProviderFromConfig($data);
 
         if ($providerName === null) {
             return null;
@@ -136,21 +126,18 @@ class SignatureService
         );
     }
 
-    protected function addDocumentSignersFromContract(Document $document, ContractEntity $contract)
+    protected function addDocumentSignersFromContract(Document $document, Contract $contract)
     {
-        if ($contract->getContractPeople()->isEmpty()) {
-            throw new MissingDataException('Este contrato não tem assinantes');
+        if ($contract->getPeoples()->isEmpty()) {
+            throw new Exception('Este contrato não tem assinantes');
         }
 
-        // add providers
-
-
-        $contractProviders = $contract->getContractPeople()
+        $contractProviders = $contract->getPeoples()
             ->filter(function ($contractPeople) {
-                return $contractPeople->getPeopleType() == 'Provider';
+                return $contractPeople->getPeopleType() == 'Beneficiary';
             });
         if ($contractProviders->isEmpty()) {
-            throw new MissingDataException('O prestador de serviços não foi definido');
+            throw new Exception('O prestador de serviços não foi definido');
         }
 
         foreach ($contractProviders as $provider) {
@@ -159,14 +146,12 @@ class SignatureService
             );
         }
 
-        // add the rest
-
-        $contractParticipants = $contract->getContractPeople()
+        $contractParticipants = $contract->getPeoples()
             ->filter(function ($contractPeople) {
-                return $contractPeople->getPeopleType() != 'Provider';
+                return $contractPeople->getPeopleType() != 'Beneficiary';
             });
         if ($contractParticipants->isEmpty()) {
-            throw new MissingDataException(
+            throw new Exception(
                 'Devem existir pelo menos 1 assinante no contrato'
             );
         }
@@ -178,14 +163,14 @@ class SignatureService
         }
     }
 
-    protected function getContractContractorSignerName(ContractEntity $contract): string
+    protected function getContractContractorSignerName(Contract $contract): string
     {
-        $contractPayers = $contract->getContractPeople()
+        $contractPayers = $contract->getPeoples()
             ->filter(function ($contractPeople) {
-                return $contractPeople->getPeopleType() == 'Payer';
+                return $contractPeople->getPeopleType() == 'Contractor';
             });
         if ($contractPayers->isEmpty()) {
-            throw new MissingDataException(
+            throw new Exception(
                 'Devem existir pelo menos 1 assinante como contratante'
             );
         }
@@ -202,25 +187,25 @@ class SignatureService
         $signer->setName($people->getFullName());
 
         if (($email = $people->getOneEmail()) === null) {
-            throw new MissingDataException(
+            throw new Exception(
                 sprintf('O %s "%s" não possui um email', $role, $people->getFullName())
             );
         }
 
         $signer->setEmail($email->getEmail());
 
-        if ($people->isPeople()) {
+        if ($people->getPeopleType() == 'F') {
             $signer->setHasCPF(true);
 
             if (($document = $people->getOneDocument()) === null) {
-                throw new MissingDataException(
+                throw new Exception(
                     sprintf('O %s "%s" não possui um CPF/CNPJ', $role, $people->getFullName())
                 );
             }
 
             $signer->setCPF($document->getDocument());
             if (($birthday = $people->getBirthdayAsString()) === null) {
-                throw new MissingDataException(
+                throw new Exception(
                     sprintf(
                         'O %s "%s" não tem data de nascimento definida',
                         $role,
