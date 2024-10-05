@@ -24,8 +24,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
         new Get(security: 'is_granted(\'ROLE_CLIENT\')'),
         new Put(
             security: 'is_granted(\'ROLE_ADMIN\') or (is_granted(\'ROLE_CLIENT\'))',
-            validationContext: ['groups' => ['people_write']],
-            denormalizationContext: ['groups' => ['people_write']]
+            validationContext: ['groups' => ['contract_people:write']],
+            denormalizationContext: ['groups' => ['contract_people:write']]
         ),
         new Delete(security: 'is_granted(\'ROLE_CLIENT\')'),
         new Post(
@@ -36,8 +36,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
     ],
     formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']],
     security: 'is_granted(\'ROLE_CLIENT\')',
-    normalizationContext: ['groups' => ['contract_people_read']],
-    denormalizationContext: ['groups' => ['contract_people_write']]
+    normalizationContext: ['groups' => ['contract_people:read']],
+    denormalizationContext: ['groups' => ['contract_people:write']]
 )]
 class ContractPeople
 {
@@ -45,41 +45,43 @@ class ContractPeople
      * @ORM\Column(type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @Groups("contract_read","contract_people_read")
+     * @Groups("contract:read","contract_people:read")
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['id' => 'exact'])]
-
     private $id;
+
     /**
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Contract")
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Contract", inversedBy="peoples")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="contract_id", referencedColumnName="id", nullable=false)
      * })
-     * @Groups("contract_people_read")
+     * @Groups("contract_people:read")
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['contract.id' => 'exact'])]
     private $contract;
+
     /**
      * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\People", inversedBy="contractsPeople")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="people_id", referencedColumnName="id", nullable=false)
      * })
-     * @Groups("contract_read","contract_people_read")
+     * @Groups("contract:read","contract_people:read")
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['people.id' => 'exact'])]
-
     private $people;
+
     /**
-     * @ORM\Column(name="people_type", type="string", columnDefinition="enum('Beneficiary', 'Witness', 'Payer', 'Provider')")
-     * @Groups("contract_read","contract_people_read")
+     * @ORM\Column(name="people_type", type="string")
+     * @Groups("contract:read","contract_people:read")
      */
-    #[ApiFilter(filterClass: SearchFilter::class, properties: ['people_type' => 'exact'])]
-    private $people_type;
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['peopleType' => 'exact'])]
+    private $peopleType;
+
     /**
      * @ORM\Column(name="contract_percentage", type="float",  nullable=true)
-     * @Groups("contract_read","contract_people_read")
+     * @Groups("contract:read","contract_people:read")
      */
-    private $contract_percentage;
+    private $contractPercentage;
 
 
     /**
@@ -137,37 +139,37 @@ class ContractPeople
     }
 
     /**
-     * Get the value of people_type
+     * Get the value of peopleType
      */
     public function getPeopleType()
     {
-        return $this->people_type;
+        return $this->peopleType;
     }
 
     /**
-     * Set the value of people_type
+     * Set the value of peopleType
      */
-    public function setPeopleType($people_type): self
+    public function setPeopleType($peopleType): self
     {
-        $this->people_type = $people_type;
+        $this->peopleType = $peopleType;
 
         return $this;
     }
 
     /**
-     * Get the value of contract_percentage
+     * Get the value of contractPercentage
      */
     public function getContractPercentage()
     {
-        return $this->contract_percentage;
+        return $this->contractPercentage;
     }
 
     /**
-     * Set the value of contract_percentage
+     * Set the value of contractPercentage
      */
-    public function setContractPercentage($contract_percentage): self
+    public function setContractPercentage($contractPercentage): self
     {
-        $this->contract_percentage = $contract_percentage;
+        $this->contractPercentage = $contractPercentage;
 
         return $this;
     }

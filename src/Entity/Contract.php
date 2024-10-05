@@ -41,8 +41,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ),
     ],
     formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']],
-    normalizationContext: ['groups' => ['contract_read']],
-    denormalizationContext: ['groups' => ['contract_write']]
+    normalizationContext: ['groups' => ['contract:read']],
+    denormalizationContext: ['groups' => ['contract:write']]
 )]
 class Contract
 {
@@ -50,7 +50,7 @@ class Contract
      * @ORM\Column(type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @Groups({ "contract_read"})
+     * @Groups({ "contract:read"})
      */
     private $id;
     /**
@@ -58,7 +58,7 @@ class Contract
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(referencedColumnName="id", nullable=false)
      * })
-     * @Groups({"contract_read","contract_write"})
+     * @Groups({"contract:read","contract:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['contractModel' => 'exact'])]
 
@@ -72,34 +72,34 @@ class Contract
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="status_id", referencedColumnName="id")
      * })
-     * @Groups({"contract_read","contract_write"})
+     * @Groups({"contract:read","contract:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['status' => 'exact'])]
 
     private $status;
     /**
      * @ORM\Column(name="doc_key", type="string")
-     * @Groups({"contract_read","contract_write"})
+     * @Groups({"contract:read","contract:write"})
      */
     private $docKey;
     /**
      * @ORM\Column(name="start_date", type="datetime",  nullable=false)
-     * @Groups({"contract_read","contract_write"})
+     * @Groups({"contract:read","contract:write"})
      */
     private $startDate;
     /**
      * @ORM\Column(name="end_date", type="datetime",  nullable=true)
-     * @Groups({"contract_read","contract_write"})
+     * @Groups({"contract:read","contract:write"})
      */
     private $endDate;
     /**
      * @ORM\Column(name="creation_date", type="datetime",  nullable=false)
-     * @Groups({"contract_read","contract_write"})
+     * @Groups({"contract:read","contract:write"})
      */
     private $creationDate;
     /**
      * @ORM\Column(name="alter_date", type="datetime",  nullable=false)
-     * @Groups({"contract_read","contract_write"})
+     * @Groups({"contract:read","contract:write"})
      */
     private $alterDate;
 
@@ -108,7 +108,7 @@ class Contract
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(referencedColumnName="id", nullable=true)
      * })
-     * @Groups({"contract_read","contract_write"})
+     * @Groups({"contract:read","contract:write"})
      */
     private $contractFile;
 
@@ -119,17 +119,15 @@ class Contract
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="beneficiary_id", referencedColumnName="id")
      * })
-     * @Groups({"contract_read","contract_write"})
+     * @Groups({"contract:read","contract:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['beneficiary' => 'exact'])]
 
     private $beneficiary;
 
     /**
-     * Many Contracts have Many Peoples.
-     *
      * @ORM\OneToMany(targetEntity="ControleOnline\Entity\ContractPeople", mappedBy="contract")
-     * @Groups({"contract_read","contract_write"})
+     * @Groups({"contract:read","contract:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['peoples' => 'exact'])]
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['peoples.people.name' => 'partial'])]

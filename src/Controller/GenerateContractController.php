@@ -26,7 +26,7 @@ class GenerateContractController
 
             $this->contract->genetateFromModel($data);
 
-            return new JsonResponse($this->hydratorService->data($data, 'contract_read'), Response::HTTP_OK);
+            return new JsonResponse($this->hydratorService->data($data, 'contract:read'), Response::HTTP_OK);
         } catch (Exception $e) {
             return new JsonResponse($this->hydratorService->error($e));
         }
