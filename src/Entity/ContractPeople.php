@@ -75,7 +75,7 @@ class ContractPeople
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="contract_id", referencedColumnName="id")
      * })
-     * @Groups({"contract_people:read"})
+     * @Groups({"contract_people:read", "contract_people:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['contract.id' => 'exact'])]
     private $contract;
