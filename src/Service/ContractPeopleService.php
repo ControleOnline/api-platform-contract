@@ -16,16 +16,10 @@ class ContractPeopleService
     private ContractService $contractService
   ) {}
 
-
-
-
   public function afterPersist(ContractPeople $contractPeople)
   {
     $contract = $contractPeople->getContract();
-
-    if ($contract->getStatus()->getRealStatus() == 'open')
-      $this->contractService->genetateFromModel($contract);
-
+    $this->contractService->genetateFromModel($contract);
     return  $contractPeople;
   }
 }

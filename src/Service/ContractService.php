@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManagerInterface;
 
 use ControleOnline\Entity\Contract;
 use ControleOnline\Entity\File;
+use ControleOnline\Entity\Status;
 
 class ContractService
 {
@@ -31,6 +32,10 @@ class ContractService
     $this->manager->persist($file);
 
     $data->setContractFile($file);
+    $data->setStatus($this->manager->getRepository(Status::class)->findOneBy([
+      'realStatus' => 'open',
+      'context' => $data->getStatus()->getContext()
+    ]));
     $this->manager->persist($data);
     $this->manager->flush();
 
