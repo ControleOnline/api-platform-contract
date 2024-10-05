@@ -67,12 +67,16 @@ class ContractPeople
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['peopleType' => 'exact'])]
     private $peopleType;
 
+
     /**
-     * @ORM\OneToMany(targetEntity="ControleOnline\Entity\Contract", mappedBy="peoples")
+     * @var \ControleOnline\Entity\Contract
+     *
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Contract", inversedBy="peoples")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="contract_id", referencedColumnName="id")
+     * })
      * @Groups("contract_people:read")
      */
-
-
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['contract.id' => 'exact'])]
     private $contract;
 

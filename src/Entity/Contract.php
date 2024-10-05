@@ -126,18 +126,12 @@ class Contract
     private $beneficiary;
 
     /**
-     * @var \ControleOnline\Entity\InvoiceTax
-     *
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\ContractPeople", inversedBy="contract")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="id", referencedColumnName="contract_id")
-     * })
+     * @var \Doctrine\Common\Collections\Collection
+     * @ORM\OneToMany(targetEntity="ControleOnline\Entity\ContractPeople", mappedBy="contract")
      * @Groups({"contract:read","contract:write"})
      */
 
-    #[ApiFilter(filterClass: SearchFilter::class, properties: ['peoples' => 'exact'])]
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['peoples.people.name' => 'partial'])]
-
     private $peoples;
 
 
@@ -147,6 +141,7 @@ class Contract
         $this->endDate = new DateTime('now');
         $this->creationDate = new DateTime('now');
         $this->alterDate = new DateTime('now');
+        $this->peoples = new \Doctrine\Common\Collections\ArrayCollection();
     }
     public function getId(): int
     {
