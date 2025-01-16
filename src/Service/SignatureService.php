@@ -1,6 +1,6 @@
 <?php
 
-namespace Controleonline\Service;
+namespace ControleOnline\Service;
 
 use ControleOnline\Entity\People;
 use ControleOnline\Entity\Contract;
