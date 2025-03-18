@@ -16,7 +16,7 @@ class ContractPeopleService
     private ContractService $contractService
   ) {}
 
-  public function afterPersist(ContractPeople $contractPeople)
+  public function postPersist(ContractPeople $contractPeople)
   {
     $contract = $contractPeople->getContract();
     $this->contractService->genetateFromModel($contract);
