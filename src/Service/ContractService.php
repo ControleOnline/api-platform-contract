@@ -59,7 +59,7 @@ class ContractService
   }
 
 
-  public function afterPersist(Contract $contract)
+  public function postPersist(Contract $contract)
   {
     if ($contract->getStatus()->getRealStatus() == 'open')
       return  $this->genetateFromModel($contract);
