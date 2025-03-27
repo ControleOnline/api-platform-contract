@@ -143,7 +143,7 @@ class Contract
         $this->alterDate = new DateTime('now');
         $this->peoples = new \Doctrine\Common\Collections\ArrayCollection();
     }
-    public function getId(): int
+    public function getId()
     {
         return $this->id;
     }
