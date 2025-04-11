@@ -1,6 +1,7 @@
 <?php
 
-namespace ControleOnline\Entity;
+namespace ControleOnline\Entity; 
+use ControleOnline\Listener\LogListener;
 
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
@@ -17,10 +18,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ORM\EntityListeners ({ControleOnline\Listener\LogListener::class})
- * @ORM\Entity (repositoryClass="ControleOnline\Repository\ContractRepository")
- */
 #[ApiResource(
     operations: [
         new Get(security: 'is_granted(\'ROLE_CLIENT\')'),
@@ -44,23 +41,23 @@ use Symfony\Component\Serializer\Annotation\Groups;
     normalizationContext: ['groups' => ['contract:read']],
     denormalizationContext: ['groups' => ['contract:write']]
 )]
+#[ORM\EntityListeners([LogListener::class])]
+#[ORM\Entity(repositoryClass: \ControleOnline\Repository\ContractRepository::class)]
 class Contract
 {
     /**
-     * @ORM\Column(type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
      * @Groups({ "contract:read"})
      */
+    #[ORM\Column(type: 'integer', nullable: false)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     private $id;
     /**
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Model")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(referencedColumnName="id", nullable=false)
-     * })
      * @Groups({"contract:read","contract:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['contractModel' => 'exact'])]
+    #[ORM\JoinColumn(referencedColumnName: 'id', nullable: false)]
+    #[ORM\ManyToOne(targetEntity: \ControleOnline\Entity\Model::class)]
 
     private $contractModel;
 
@@ -68,70 +65,63 @@ class Contract
     /**
      * @var \ControleOnline\Entity\Status
      *
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Status")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="status_id", referencedColumnName="id")
-     * })
      * @Groups({"contract:read","contract:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['status' => 'exact'])]
+    #[ORM\JoinColumn(name: 'status_id', referencedColumnName: 'id')]
+    #[ORM\ManyToOne(targetEntity: \ControleOnline\Entity\Status::class)]
 
     private $status;
     /**
-     * @ORM\Column(name="doc_key", type="string")
      * @Groups({"contract:read","contract:write"})
      */
+    #[ORM\Column(name: 'doc_key', type: 'string')]
     private $docKey;
     /**
-     * @ORM\Column(name="start_date", type="datetime",  nullable=false)
      * @Groups({"contract:read","contract:write"})
      */
+    #[ORM\Column(name: 'start_date', type: 'datetime', nullable: false)]
     private $startDate;
     /**
-     * @ORM\Column(name="end_date", type="datetime",  nullable=true)
      * @Groups({"contract:read","contract:write"})
      */
+    #[ORM\Column(name: 'end_date', type: 'datetime', nullable: true)]
     private $endDate;
     /**
-     * @ORM\Column(name="creation_date", type="datetime",  nullable=false)
      * @Groups({"contract:read","contract:write"})
      */
+    #[ORM\Column(name: 'creation_date', type: 'datetime', nullable: false)]
     private $creationDate;
     /**
-     * @ORM\Column(name="alter_date", type="datetime",  nullable=false)
      * @Groups({"contract:read","contract:write"})
      */
+    #[ORM\Column(name: 'alter_date', type: 'datetime', nullable: false)]
     private $alterDate;
 
     /**
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\File")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(referencedColumnName="id", nullable=true)
-     * })
      * @Groups({"contract:read","contract:write"})
      */
+    #[ORM\JoinColumn(referencedColumnName: 'id', nullable: true)]
+    #[ORM\ManyToOne(targetEntity: \ControleOnline\Entity\File::class)]
     private $contractFile;
 
     /**
      * @var \ControleOnline\Entity\People
      *
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\People")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="beneficiary_id", referencedColumnName="id")
-     * })
      * @Groups({"contract:read","contract:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['beneficiary' => 'exact'])]
+    #[ORM\JoinColumn(name: 'beneficiary_id', referencedColumnName: 'id')]
+    #[ORM\ManyToOne(targetEntity: \ControleOnline\Entity\People::class)]
 
     private $beneficiary;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
-     * @ORM\OneToMany(targetEntity="ControleOnline\Entity\ContractPeople", mappedBy="contract")
      * @Groups({"contract:read","contract:write"})
      */
-
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['peoples.people.name' => 'partial'])]
+    #[ORM\OneToMany(targetEntity: \ControleOnline\Entity\ContractPeople::class, mappedBy: 'contract')]
     private $peoples;
 
 
