@@ -14,7 +14,8 @@ class ContractService
   public function __construct(
     private EntityManagerInterface $manager,
     private PdfService $pdf,
-    private ModelService $modelService
+    private ModelService $modelService,
+    private StatusService $statusService
   ) {}
 
   public function genetateFromModel(Contract $data)
@@ -32,10 +33,13 @@ class ContractService
     $this->manager->persist($file);
 
     $data->setContractFile($file);
-    $data->setStatus($this->manager->getRepository(Status::class)->findOneBy([
-      'realStatus' => 'open',
-      'context' => $data->getStatus()->getContext()
-    ]));
+    $data->setStatus(
+      $this->statusService->discoveryStatus(
+        'open',
+        'open',
+        $data->getStatus()->getContext()
+      )
+    );
     $this->manager->persist($data);
     $this->manager->flush();
 

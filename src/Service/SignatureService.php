@@ -22,6 +22,7 @@ class SignatureService
         private EntityManagerInterface $manager,
         private PeopleRoleService $peopleRoleService,
         private ContractService $contractService,
+        private StatusService $statusService
     ) {}
 
 
@@ -51,8 +52,10 @@ class SignatureService
             */
 
             $data->setStatus(
-                $this->manager->getRepository(Status::class)->findOneBy(
-                    ['status' => 'Waiting Signature']
+                $this->statusService->discoveryStatus(
+                    'open',
+                    'Waiting Signature',
+                    'contract'
                 )
             );
             $data->setDocKey($document->getKey());
