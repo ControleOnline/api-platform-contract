@@ -33,13 +33,7 @@ class ContractService
     $this->manager->persist($file);
 
     $data->setContractFile($file);
-    $data->setStatus(
-      $this->statusService->discoveryStatus(
-        'open',
-        'open',
-        'contract'
-      )
-    );
+
     $this->manager->persist($data);
     $this->manager->flush();
 
@@ -65,18 +59,19 @@ class ContractService
 
   public function prePersist(Contract $contract)
   {
-    return $contract->setStatus(
-      $this->statusService->discoveryStatus(
-        'open',
-        'open',
-        'contract'
-      )
-    );
+    if (!$contract->getStatus())
+      return $contract->setStatus(
+        $this->statusService->discoveryStatus(
+          'open',
+          'open',
+          'contract'
+        )
+      );
   }
 
   public function postPersist(Contract $contract)
   {
-    if ($contract->getStatus()->getRealStatus() == 'open')
-      return  $this->genetateFromModel($contract);
+    //if ($contract->getStatus()->getRealStatus() == 'open')
+      //return  $this->genetateFromModel($contract);
   }
 }
