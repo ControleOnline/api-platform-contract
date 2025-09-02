@@ -37,7 +37,7 @@ class ContractService
       $this->statusService->discoveryStatus(
         'open',
         'open',
-        $data->getStatus()->getContext()
+        'contract'
       )
     );
     $this->manager->persist($data);
