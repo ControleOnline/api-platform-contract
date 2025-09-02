@@ -63,6 +63,17 @@ class ContractService
   }
 
 
+  public function prePersist(Contract $contract)
+  {
+    return $contract->setStatus(
+      $this->statusService->discoveryStatus(
+        'open',
+        'open',
+        'contract'
+      )
+    );
+  }
+
   public function postPersist(Contract $contract)
   {
     if ($contract->getStatus()->getRealStatus() == 'open')
