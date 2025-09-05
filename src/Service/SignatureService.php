@@ -46,10 +46,8 @@ class SignatureService
                         ->add(new \DateInterval('P7D'))
                         ->format('c')
                 );
-            /*
-            $this->addDocumentSignersFromContract($document, $data);
-            $this->signatureProvider->saveDocument($document);
-            */
+
+            
 
             $data->setStatus(
                 $this->statusService->discoveryStatus(
@@ -62,6 +60,11 @@ class SignatureService
 
             $this->manager->persist($data);
             $this->manager->flush();
+
+            
+            $this->addDocumentSignersFromContract($document, $data);
+            $this->signatureProvider->saveDocument($document);
+
         }
         return $data;
     }
