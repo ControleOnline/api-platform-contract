@@ -18,8 +18,8 @@ class ContractPeopleService
 
   public function postPersist(ContractPeople $contractPeople)
   {
-    //$contract = $contractPeople->getContract();
-    //$this->contractService->genetateFromModel($contract);
-    //return  $contractPeople;
+    $contract = $contractPeople->getContract();
+    $this->contractService->genetateFromModel($contract);
+    return  $contractPeople;
   }
 }

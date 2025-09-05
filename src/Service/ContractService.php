@@ -25,7 +25,7 @@ class ContractService
       $file = new File();
 
     $file->setFileType('text');
-    $file->setExtension('html');
+    $file->setExtension('html');    
     $file->setContent($this->modelService->genetateFromModel($data));
     $file->setFileName($data->getContractModel()->getModel());
     $file->setPeople($data->getBeneficiary());
@@ -71,7 +71,7 @@ class ContractService
 
   public function postPersist(Contract $contract)
   {
-    //if ($contract->getStatus()->getRealStatus() == 'open')
-      //return  $this->genetateFromModel($contract);
+    if ($contract->getStatus()->getRealStatus() == 'open')
+      return  $this->genetateFromModel($contract);
   }
 }
