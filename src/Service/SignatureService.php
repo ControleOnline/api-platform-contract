@@ -29,6 +29,14 @@ class SignatureService
     public function sign(Contract $data)
     {
 
+        $data->setStatus(
+            $this->statusService->discoveryStatus(
+                'open',
+                'Waiting Signature',
+                'contract'
+            )
+        );
+
         $this->signatureProvider = $this->getFactory($data);
 
         if ($this->signatureProvider !== null) {
@@ -47,25 +55,14 @@ class SignatureService
                         ->format('c')
                 );
 
-            
-
-            $data->setStatus(
-                $this->statusService->discoveryStatus(
-                    'open',
-                    'Waiting Signature',
-                    'contract'
-                )
-            );
             $data->setDocKey($document->getKey());
-
-            $this->manager->persist($data);
-            $this->manager->flush();
-
-            
             $this->addDocumentSignersFromContract($document, $data);
             $this->signatureProvider->saveDocument($document);
-
         }
+
+
+        $this->manager->persist($data);
+        $this->manager->flush();
         return $data;
     }
 
