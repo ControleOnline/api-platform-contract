@@ -135,30 +135,11 @@ class SignatureService
             throw new Exception('Este contrato não tem assinantes');
         }
 
-        $contractProviders = $contract->getPeoples()
-            ->filter(function ($contractPeople) {
-                return $contractPeople->getPeopleType() == 'Beneficiary';
-            });
-        if ($contractProviders->isEmpty()) {
-            throw new Exception('O prestador de serviços não foi definido');
-        }
+        $document->addSigner(
+            $this->getSignerFromPeople($contract->getContractModel()->getSigner(), 'assinante')
+        );
 
-        foreach ($contractProviders as $provider) {
-            $document->addSigner(
-                $this->getSignerFromPeople($provider->getPeople(), 'prestador de serviços')
-            );
-        }
-
-        $contractParticipants = $contract->getPeoples()
-            ->filter(function ($contractPeople) {
-                return $contractPeople->getPeopleType() != 'Beneficiary';
-            });
-        if ($contractParticipants->isEmpty()) {
-            throw new Exception(
-                'Devem existir pelo menos 1 assinante no contrato'
-            );
-        }
-
+        $contractParticipants = $contract->getPeoples();
         foreach ($contractParticipants as $participant) {
             $document->addSigner(
                 $this->getSignerFromPeople($participant->getPeople(), 'assinante')
