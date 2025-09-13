@@ -31,7 +31,7 @@ class SignatureService
 
         $data->setStatus(
             $this->statusService->discoveryStatus(
-                'open',
+                'pending',
                 'Waiting Signature',
                 'contract'
             )
