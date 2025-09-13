@@ -136,13 +136,13 @@ class SignatureService
         }
 
         $document->addSigner(
-            $this->getSignerFromPeople($contract->getContractModel()->getSigner(), 'assinante')
+            $this->getSignerFromPeople($contract->getContractModel()->getSigner(), 'responsável')
         );
 
         $contractParticipants = $contract->getPeoples();
         foreach ($contractParticipants as $participant) {
             $document->addSigner(
-                $this->getSignerFromPeople($participant->getPeople(), 'assinante')
+                $this->getSignerFromPeople($participant->getPeople(), $participant->getpeopleType())
             );
         }
     }
