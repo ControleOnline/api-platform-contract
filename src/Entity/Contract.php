@@ -20,7 +20,7 @@ use ControleOnline\Entity\File;
 use ControleOnline\Entity\People;
 use ControleOnline\Entity\ContractPeople;
 use ControleOnline\Repository\ContractRepository;
-use ControleOnline\Listener\LogListener;
+
 use ControleOnline\Controller\GenerateContractController;
 use ControleOnline\Controller\SignContractController;
 use DateTime;

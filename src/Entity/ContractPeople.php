@@ -16,7 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
 use ControleOnline\Entity\People;
 use ControleOnline\Entity\Contract;
 use ControleOnline\Repository\ContractPeopleRepository;
-use ControleOnline\Listener\LogListener;
+
 
 #[ORM\Table(name: 'contract_people')]
 
