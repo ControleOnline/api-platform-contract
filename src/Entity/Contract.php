@@ -25,7 +25,7 @@ use ControleOnline\Controller\GenerateContractController;
 use ControleOnline\Controller\SignContractController;
 use DateTime;
 
-#[ORM\EntityListeners([LogListener::class])]
+
 #[ORM\Entity(repositoryClass: ContractRepository::class)]
 #[ApiResource(
     formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']],

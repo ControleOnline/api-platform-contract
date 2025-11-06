@@ -19,7 +19,7 @@ use ControleOnline\Repository\ContractPeopleRepository;
 use ControleOnline\Listener\LogListener;
 
 #[ORM\Table(name: 'contract_people')]
-#[ORM\EntityListeners([LogListener::class])]
+
 #[ORM\Entity(repositoryClass: ContractPeopleRepository::class)]
 #[ApiResource(
     formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']],
