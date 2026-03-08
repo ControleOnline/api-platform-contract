@@ -54,6 +54,7 @@ use DateTime;
     'contractModel' => 'exact',
     'status' => 'exact',
     'beneficiary' => 'exact',
+    'contractModel.context'=> 'exact',
     'peoples.people.name' => 'partial'
 ])]
 class Contract
