@@ -25,7 +25,7 @@ class ContractService
       $file = new File();
 
     $file->setFileType('text');
-    $file->setExtension('html');    
+    $file->setExtension('html');
     $file->setContent($this->modelService->genetateFromModel($data));
     $file->setFileName($data->getContractModel()->getModel());
     $file->setPeople($data->getBeneficiary());
@@ -60,14 +60,26 @@ class ContractService
 
   public function prePersist(Contract $contract)
   {
-    if (!$contract->getStatus())
-      return $contract->setStatus(
-        $this->statusService->discoveryStatus(
-          'open',
-          'open',
-          'contract'
-        )
+
+    $openStatus =
+      $this->statusService->discoveryStatus(
+        'open',
+        'open',
+        'contract'
       );
+
+    if (!$contract->getStatus())
+      $contract->setStatus(
+        $openStatus
+      );
+
+    if ($contract->getStatus()->getRealStatus() != 'open')
+      throw new \Exception(
+        sprintf('Not modify contracts if is not open')
+      );
+
+    return $contract;
+    
   }
 
   public function postPersist(Contract $contract)
