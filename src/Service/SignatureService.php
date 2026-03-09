@@ -85,7 +85,7 @@ class SignatureService
 
     private function getDefaultProviderFromConfig(Contract $data): ?string
     {
-        $myCompany = $data->getBeneficiary();
+        $myCompany = $data->getProvider();
 
 
         if ($myCompany instanceof People) {

@@ -28,7 +28,7 @@ class ContractService
     $file->setExtension('html');
     $file->setContent($this->modelService->genetateFromModel($data));
     $file->setFileName($data->getContractModel()->getModel());
-    $file->setPeople($data->getBeneficiary());
+    $file->setPeople($data->getProvider());
     $file->setContext($data->getContractModel()->getContext());
 
     $this->manager->persist($file);

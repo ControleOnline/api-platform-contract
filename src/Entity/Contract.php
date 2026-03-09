@@ -53,8 +53,8 @@ use DateTime;
 #[ApiFilter(SearchFilter::class, properties: [
     'contractModel' => 'exact',
     'status' => 'exact',
-    'beneficiary' => 'exact',
-    'contractModel.context'=> 'exact',
+    'provider' => 'exact',
+    'contractModel.context' => 'exact',
     'peoples.people.name' => 'partial'
 ])]
 class Contract
@@ -101,9 +101,15 @@ class Contract
     private $contractFile;
 
     #[ORM\ManyToOne(targetEntity: People::class)]
-    #[ORM\JoinColumn(name: 'beneficiary_id', referencedColumnName: 'id')]
+    #[ORM\JoinColumn(name: 'provider_id', referencedColumnName: 'id')]
     #[Groups(['contract:read', 'contract:write'])]
-    private $beneficiary;
+    private $provider;
+
+
+    #[ORM\ManyToOne(targetEntity: People::class)]
+    #[ORM\JoinColumn(name: 'client_id', referencedColumnName: 'id')]
+    #[Groups(['contract:read', 'contract:write'])]
+    private $client;
 
     #[ORM\OneToMany(targetEntity: ContractPeople::class, mappedBy: 'contract')]
     #[Groups(['contract:read', 'contract:write'])]
@@ -189,14 +195,14 @@ class Contract
         return $this;
     }
 
-    public function getBeneficiary()
+    public function getProvider()
     {
-        return $this->beneficiary;
+        return $this->provider;
     }
 
-    public function setBeneficiary($beneficiary): self
+    public function setProvider($provider): self
     {
-        $this->beneficiary = $beneficiary;
+        $this->provider = $provider;
         return $this;
     }
 
@@ -235,6 +241,18 @@ class Contract
     public function setDocKey($docKey): self
     {
         $this->docKey = $docKey;
+        return $this;
+    }
+
+    public function getClient()
+    {
+        return $this->client;
+    }
+
+    public function setClient($client): self
+    {
+        $this->client = $client;
+
         return $this;
     }
 }
