@@ -125,9 +125,9 @@ class ContractService
       PeopleLink::class,
       'pl_owner',
       'WITH',
-      'pl_owner.company = pl_client.company 
+      sprintf('pl_owner.company = %s.provider 
          AND pl_owner.people = :currentUser
-         AND pl_owner.linkType = :ownerLinkType'
+         AND pl_owner.linkType = :ownerLinkType', $rootAlias)
     );
 
     $queryBuilder->andWhere(
