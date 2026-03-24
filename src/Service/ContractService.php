@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use ControleOnline\Entity\Contract;
 use ControleOnline\Entity\File;
 use ControleOnline\Entity\PeopleLink;
+use ControleOnline\Entity\Status;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface as Security;
 
@@ -18,6 +19,7 @@ class ContractService
     private PdfService $pdf,
     private ModelService $modelService,
     private StatusService $statusService,
+    private PeopleService $peopleService,
     private Security $security,
   ) {}
 
@@ -93,6 +95,7 @@ class ContractService
   public function securityFilter(QueryBuilder $queryBuilder, $resourceClass = null, $applyTo = null, $rootAlias = null): void
   {
     $currentUser = $this->security->getToken()->getUser()->getPeople();
+    $companies   = $this->peopleService->getMyCompanies();
 
     // JOIN client da empresa
     $queryBuilder->innerJoin(
@@ -100,8 +103,10 @@ class ContractService
       'pl_client',
       'WITH',
       sprintf('pl_client.people = %s.client 
+                 AND pl_client.company IN(:companies)
                  AND pl_client.linkType = :clientLinkType', $rootAlias)
     );
+    $queryBuilder->setParameter('companies', $companies);
 
     // Clientes do vendedor
     $queryBuilder->leftJoin(
