@@ -96,21 +96,47 @@ class ContractService
   {
     $currentUser = $this->security->getToken()->getUser()->getPeople();
     $companies   = $this->peopleService->getMyCompanies();
-    $queryBuilder->andWhere(sprintf('%s.provider IN(:companies)', $rootAlias, $rootAlias));
+
+    $queryBuilder->andWhere(sprintf('%s.provider IN(:companies)', $rootAlias));
     $queryBuilder->setParameter('companies', $companies);
 
 
-
+    // JOIN client da empresa
     $queryBuilder->innerJoin(
       PeopleLink::class,
-      'PeopleLink',
+      'pl_client',
       'WITH',
-      sprintf('(PeopleLink.people = %s.client         AND 
-                PeopleLink.linkType IN(:linkType)     AND 
-                PeopleLink.company = :currentUser)',  $rootAlias, $rootAlias)
+      sprintf('pl_client.people = %s.client 
+                 AND pl_client.linkType = :clientLinkType', $rootAlias)
     );
 
-    $queryBuilder->setParameter('linkType', 'sellers-client');
+    // Clientes do vendedor
+    $queryBuilder->leftJoin(
+      PeopleLink::class,
+      'pl_seller',
+      'WITH',
+      sprintf('pl_seller.people = %s.client 
+                 AND pl_seller.linkType = :sellerLinkType
+                 AND pl_seller.company = :currentUser', $rootAlias)
+    );
+
+    // JOIN owner (eu sou dono da empresa)
+    $queryBuilder->leftJoin(
+      PeopleLink::class,
+      'pl_owner',
+      'WITH',
+      'pl_owner.company = pl_client.company 
+         AND pl_owner.people = :currentUser
+         AND pl_owner.linkType = :ownerLinkType'
+    );
+
+    $queryBuilder->andWhere(
+      'pl_seller.id IS NOT NULL OR pl_owner.id IS NOT NULL'
+    );
+
+    $queryBuilder->setParameter('sellerLinkType', 'sellers-client');
+    $queryBuilder->setParameter('clientLinkType', 'client');
+    $queryBuilder->setParameter('ownerLinkType', 'owner');
     $queryBuilder->setParameter('currentUser', $currentUser);
   }
 }
