@@ -6,7 +6,10 @@ use Doctrine\ORM\EntityManagerInterface;
 
 use ControleOnline\Entity\Contract;
 use ControleOnline\Entity\File;
+use ControleOnline\Entity\PeopleLink;
 use ControleOnline\Entity\Status;
+use Doctrine\ORM\QueryBuilder;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface as Security;
 
 class ContractService
 {
@@ -15,7 +18,9 @@ class ContractService
     private EntityManagerInterface $manager,
     private PdfService $pdf,
     private ModelService $modelService,
-    private StatusService $statusService
+    private StatusService $statusService,
+    private PeopleService $peopleService,
+    private Security $security,
   ) {}
 
   public function genetateFromModel(Contract $data)
@@ -79,12 +84,34 @@ class ContractService
       );
 
     return $contract;
-    
   }
 
   public function postPersist(Contract $contract)
   {
     if ($contract->getStatus()->getRealStatus() == 'open')
       return  $this->genetateFromModel($contract);
+  }
+
+  public function securityFilter(QueryBuilder $queryBuilder, $resourceClass = null, $applyTo = null, $rootAlias = null): void
+  {
+    $currentUser = $this->security->getToken()->getUser()->getPeople();
+    $companies   = $this->peopleService->getMyCompanies();
+    $queryBuilder->andWhere(sprintf('%s.provider IN(:companies)', $rootAlias, $rootAlias));
+    $queryBuilder->setParameter('companies', $companies);
+
+
+    $companies   = $this->peopleService->getMyCompanies();
+
+    $queryBuilder->leftJoin(
+      PeopleLink::class,
+      'PeopleLink',
+      'WITH',
+      sprintf('(PeopleLink.company = %s.client)', $rootAlias, $rootAlias)
+    );
+
+    $queryBuilder->andWhere('PeopleLink.linkType IN(:linkType)');
+    $queryBuilder->andWhere('PeopleLink.people = :currentUser');
+    $queryBuilder->setParameter('linkType', 'sellers-client');
+    $queryBuilder->setParameter('currentUser', $currentUser);
   }
 }
