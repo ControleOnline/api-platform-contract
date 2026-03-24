@@ -106,11 +106,11 @@ class ContractService
       PeopleLink::class,
       'PeopleLink',
       'WITH',
-      sprintf('(PeopleLink.company = %s.client)', $rootAlias, $rootAlias)
+      sprintf('(PeopleLink.people = %s.client)', $rootAlias, $rootAlias)
     );
 
     $queryBuilder->andWhere('PeopleLink.linkType IN(:linkType)');
-    $queryBuilder->andWhere('PeopleLink.people = :currentUser');
+    $queryBuilder->andWhere('PeopleLink.company = :currentUser');
     $queryBuilder->setParameter('linkType', 'sellers-client');
     $queryBuilder->setParameter('currentUser', $currentUser);
   }
