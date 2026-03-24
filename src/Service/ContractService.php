@@ -100,17 +100,16 @@ class ContractService
     $queryBuilder->setParameter('companies', $companies);
 
 
-    $companies   = $this->peopleService->getMyCompanies();
 
-    $queryBuilder->leftJoin(
+    $queryBuilder->innerJoin(
       PeopleLink::class,
       'PeopleLink',
       'WITH',
-      sprintf('(PeopleLink.people = %s.client)', $rootAlias, $rootAlias)
+      sprintf('(PeopleLink.people = %s.client         AND 
+                PeopleLink.linkType IN(:linkType)     AND 
+                PeopleLink.company = :currentUser)',  $rootAlias, $rootAlias)
     );
 
-    $queryBuilder->andWhere('PeopleLink.linkType IN(:linkType)');
-    $queryBuilder->andWhere('PeopleLink.company = :currentUser');
     $queryBuilder->setParameter('linkType', 'sellers-client');
     $queryBuilder->setParameter('currentUser', $currentUser);
   }
