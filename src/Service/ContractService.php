@@ -125,7 +125,7 @@ class ContractService
       'WITH',
       sprintf('pl_owner.company = %s.provider 
          AND pl_owner.people = :currentUser
-         AND pl_owner.linkType = :ownerLinkType', $rootAlias)
+         AND pl_owner.linkType  IN(:managerLinkType)', $rootAlias)
     );
 
     $queryBuilder->andWhere(
@@ -134,7 +134,7 @@ class ContractService
 
     $queryBuilder->setParameter('sellerLinkType', 'sellers-client');
     $queryBuilder->setParameter('clientLinkType', 'client');
-    $queryBuilder->setParameter('ownerLinkType', 'owner');
+    $queryBuilder->setParameter('managerLinkType', PeopleLink::MANAGER_LINK);
     $queryBuilder->setParameter('currentUser', $currentUser);
   }
 }
