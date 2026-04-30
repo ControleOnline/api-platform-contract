@@ -25,19 +25,19 @@ use ControleOnline\Repository\ContractPeopleRepository;
     formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']],
     normalizationContext: ['groups' => ['contract_people:read']],
     denormalizationContext: ['groups' => ['contract_people:write']],
-    security: "is_granted('ROLE_CLIENT')",
+    security: "is_granted('ROLE_HUMAN')",
     operations: [
-        new GetCollection(security: "is_granted('ROLE_CLIENT')"),
-        new Get(security: "is_granted('ROLE_CLIENT')"),
+        new GetCollection(security: "is_granted('ROLE_HUMAN')"),
+        new Get(security: "is_granted('ROLE_HUMAN')"),
         new Post(
-            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')"
+            security: "is_granted('ROLE_HUMAN')"
         ),
         new Put(
-            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')",
+            security: "is_granted('ROLE_HUMAN')",
             validationContext: ['groups' => ['contract_people:write']],
             denormalizationContext: ['groups' => ['contract_people:write']]
         ),
-        new Delete(security: "is_granted('ROLE_CLIENT')")
+        new Delete(security: "is_granted('ROLE_HUMAN')")
     ]
 )]
 #[ApiFilter(SearchFilter::class, properties: [

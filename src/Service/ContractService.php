@@ -94,8 +94,17 @@ class ContractService
 
   public function securityFilter(QueryBuilder $queryBuilder, $resourceClass = null, $applyTo = null, $rootAlias = null): void
   {
-    $currentUser = $this->security->getToken()->getUser()->getPeople();
+    $token = $this->security->getToken();
+    $user = $token?->getUser();
+    $currentUser = is_object($user) && method_exists($user, 'getPeople')
+      ? $user->getPeople()
+      : null;
     $companies   = $this->peopleService->getMyCompanies();
+
+    if (!$currentUser || $companies === []) {
+      $queryBuilder->andWhere('1 = 0');
+      return;
+    }
 
     // JOIN client da empresa
     $queryBuilder->innerJoin(

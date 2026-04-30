@@ -33,19 +33,19 @@ use DateTime;
     normalizationContext: ['groups' => ['contract:read']],
     denormalizationContext: ['groups' => ['contract:write']],
     operations: [
-        new GetCollection(security: "is_granted('ROLE_CLIENT')"),
-        new Get(security: "is_granted('ROLE_CLIENT')"),
+        new GetCollection(security: "is_granted('ROLE_HUMAN')"),
+        new Get(security: "is_granted('ROLE_HUMAN')"),
         new Post(
-            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')"
+            security: "is_granted('ROLE_HUMAN')"
         ),
-        new Put(security: "is_granted('ROLE_CLIENT')"),
+        new Put(security: "is_granted('ROLE_HUMAN')"),
         new Post(
-            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')",
+            security: "is_granted('ROLE_HUMAN')",
             uriTemplate: '/contracts/{id}/generate',
             controller: GenerateContractController::class
         ),
         new Post(
-            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')",
+            security: "is_granted('ROLE_HUMAN')",
             uriTemplate: '/contracts/{id}/sign',
             controller: SignContractController::class
         )
