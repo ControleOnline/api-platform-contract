@@ -57,6 +57,7 @@ use DateTime;
     'status.realStatus' => 'exact',
     'provider' => 'exact',
     'client' => 'exact',
+    'peoples.people' => 'exact',
     'contractModel.context' => 'exact',
     'peoples.people.name' => 'partial'
 ])]
