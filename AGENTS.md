@@ -1,10 +1,6 @@
-## Escopo
-- Modulo de contratos.
-- Cobre entidades de contrato, relacionamento entre contrato e pessoas, geracao e assinatura.
+## Ponto de entrada
 
-## Quando usar
-- Prompts sobre contratos, `Contract`, `ContractPeople`, geracao de documento contratual e fluxo de assinatura.
-
-## Limites
-- A integracao com provedor externo de assinatura deve ficar em `integration`.
-- A regra de negocio do contrato continua sendo dona deste modulo.
+- A documentação funcional e de regras deste modulo vive na wiki do proprio repositório e na wiki principal da API.
+- Regras transversais de qualidade, modularizacao e limites de componente vivem em `https://github.com/ControleOnline/agents-mcp/blob/master/skills/shared/code-quality.md`.
+- Quando houver detalhe especifico de implementacao, prefira comentar no codigo em ingles perto da regra.
+- Este arquivo deve ficar curto e servir apenas como ponte para as fontes oficiais.
