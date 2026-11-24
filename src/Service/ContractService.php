@@ -33,6 +33,7 @@ class ContractService
     private EntityManagerInterface $manager,
     private PdfService $pdf,
     private ModelService $modelService,
+    private ContractDocumentContextBuilder $documentContextBuilder,
     private StatusService $statusService,
     private PeopleService $peopleService,
     private Security $security,
@@ -46,7 +47,7 @@ class ContractService
 
     $file->setFileType('text');
     $file->setExtension('html');
-    $file->setContent($this->modelService->genetateFromModel($data));
+    $file->setContent($this->renderContractDocument($data));
     $file->setFileName($data->getContractModel()->getModel());
     $file->setPeople($data->getProvider());
     $file->setContext($data->getContractModel()->getContext());
@@ -59,6 +60,40 @@ class ContractService
     $this->manager->flush();
 
     return $data;
+  }
+
+  /**
+   * Renders the contract/proposal model with the products of the linked order,
+   * so templates can print them (see ContractDocumentContextBuilder).
+   */
+  public function renderContractDocument(Contract $contract): string
+  {
+    return $this->modelService->render(
+      $contract->getContractModel(),
+      array_merge(
+        [
+          'contract' => $contract,
+          'service' => $this->modelService,
+          'client' => $contract->getClient(),
+          'provider' => $contract->getProvider(),
+        ],
+        $this->documentContextBuilder->build($this->findLinkedOrder($contract))
+      )
+    );
+  }
+
+  private function findLinkedOrder(Contract $contract): ?object
+  {
+    // Order lives in the orders module; resolve it by name to keep this module decoupled.
+    $orderClass = 'ControleOnline\Entity\Order';
+    if (!$contract->getId() || !class_exists($orderClass)) {
+      return null;
+    }
+
+    return $this->manager->getRepository($orderClass)->findOneBy(
+      ['contract' => $contract],
+      ['id' => 'DESC']
+    );
   }
 
   public function getContractPDFContent(Contract $contract): string
