@@ -28,6 +28,9 @@ class SignatureService
 
     public function sign(Contract $data)
     {
+        // Products can change after the draft was generated; sign the current version.
+        $this->contractService->genetateFromModel($data);
+
 
         $data->setStatus(
             $this->statusService->discoveryStatus(
